@@ -1,10 +1,10 @@
 # Custom cosmetic pack format (prototype)
 
-Put packs in the game directory under:
+Put cosmetic definitions anywhere inside the game directory's:
 
 `config/voidcraft-cosmetics/`
 
-Each definition is a JSON file, for example `starter_cap.json`:
+The loader searches subfolders recursively for JSON definitions. Example `starter/starter_cap.json`:
 
 ```json
 {
@@ -12,23 +12,29 @@ Each definition is a JSON file, for example `starter_cap.json`:
   "id": "starter_cap",
   "name": "Starter Cap",
   "slot": "head",
-  "model": "models/starter_cap.json",
-  "texture": "textures/starter_cap.png",
+  "model": "starter/models/starter_cap.json",
+  "texture": "starter/textures/starter_cap.png",
   "animation": ""
 }
 ```
 
-Place the referenced files relative to the same directory:
+Referenced asset paths are relative to the main `config/voidcraft-cosmetics/` directory, not the definition's subfolder. For the example above, place the assets at:
 
 ```text
 config/voidcraft-cosmetics/
-├── starter_cap.json
-├── models/
-│   └── starter_cap.json
-└── textures/
-    └── starter_cap.png
+└── starter/
+    ├── starter_cap.json
+    ├── models/
+    │   └── starter_cap.json
+    └── textures/
+        └── starter_cap.png
 ```
 
-Allowed slots in this prototype are `head`, `body`, `back`, `legs`, and `feet`. Paths must stay inside the cosmetics directory. The loader discovers definitions and checks that referenced files exist. **Custom model JSON and textures are not yet connected to the renderer.**
+Validation currently checks:
+- `format_version` is 1 when supplied.
+- `id` uses lowercase letters, digits, underscores, dots or hyphens and is unique across discovered packs.
+- `slot` is one of `head`, `body`, `back`, `legs` or `feet`.
+- The model path ends in `.json`, the texture path ends in `.png`, and both files exist.
+- Asset paths stay inside the cosmetics directory.
 
-The currently rendered prototype cap is a separate built-in 3D mesh using Minecraft's purple wool texture. It can be toggled with **O**. Do not assume the custom model JSON is compatible with Blockbench, GeckoLib, or Minecraft's vanilla model format until a format adapter is implemented.
+**Important:** this is still pack metadata validation only. The model JSON is not parsed and custom pack models/textures are not yet connected to the in-game renderer. The visible prototype cap is a separate built-in 3D mesh using Minecraft's purple wool texture, toggled with **O**. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
