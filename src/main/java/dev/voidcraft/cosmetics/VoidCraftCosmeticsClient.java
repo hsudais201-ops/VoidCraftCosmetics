@@ -25,6 +25,7 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
     private static final Logger LOGGER = Logger.getLogger("VoidCraftCosmetics");
     private KeyBinding cycleCosmeticsKey;
     private KeyBinding cycleCustomPackKey;
+    private KeyBinding openCosmeticsMenuKey;
     private List<CosmeticPackLoader.CosmeticPack> discoveredPacks = List.of();
     private Path settingsFile;
 
@@ -58,7 +59,19 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
                 "category.voidcraft_cosmetics"
         ));
 
+        openCosmeticsMenuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.voidcraft_cosmetics.open_menu",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_M,
+                "category.voidcraft_cosmetics"
+        ));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (openCosmeticsMenuKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    client.setScreen(new CosmeticSelectionScreen(null, discoveredPacks, this::saveSettings));
+                }
+            }
             while (cycleCustomPackKey.wasPressed()) {
                 String selected = CosmeticPackFeatureRenderer.cycleSelectedPack(discoveredPacks);
                 saveSettings();
