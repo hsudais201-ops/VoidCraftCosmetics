@@ -52,7 +52,7 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         ));
 
         cycleCosmeticsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.voidcraft_cosmetics.open_menu",
+                "key.voidcraft_cosmetics.cycle_builtin_cap",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_O,
                 "category.voidcraft_cosmetics"
