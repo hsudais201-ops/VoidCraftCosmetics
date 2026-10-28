@@ -108,9 +108,9 @@ public final class CosmeticPackLoader {
 
             String animation = json.has("animation") && !json.get("animation").isJsonNull()
                     ? json.get("animation").getAsString().toLowerCase(Locale.ROOT) : "";
-            if (!List.of("", "bob", "spin", "sway", "pulse").contains(animation)) {
+            if (!List.of("", "bob", "spin", "sway", "flap", "pulse").contains(animation)) {
                 throw new IllegalArgumentException("unsupported animation preset: " + animation
-                        + " (supported: bob, spin, sway, pulse, or empty)");
+                        + " (supported: bob, spin, sway, flap, pulse, or empty)");
             }
             packs.add(new CosmeticPack(id, name, slot, modelPath, texturePath, animation));
             ids.add(id);
