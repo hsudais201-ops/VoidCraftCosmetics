@@ -14,6 +14,7 @@ public final class CosmeticSelectionScreen extends Screen {
     private final Runnable saveSettings;
     private final Runnable reloadPacks;
     private int packIndex;
+    private boolean previewWarningShown;
 
     public CosmeticSelectionScreen(Screen parent, List<CosmeticPackLoader.CosmeticPack> packs, Runnable saveSettings, Runnable reloadPacks) {
         super(Text.literal("VoidCraft Cosmetics"));
@@ -181,8 +182,9 @@ public final class CosmeticSelectionScreen extends Screen {
             context.drawEntity(width / 2 - 150, height / 2 + 36, 32,
                     new Quaternionf().rotateY((float) Math.toRadians(25)), null, client.player);
         } catch (RuntimeException exception) {
-            // A preview failure must not break the selection screen.
-            if (client.player != null) {
+            // A preview failure must not break the selection screen or spam chat.
+            if (!previewWarningShown && client.player != null) {
+                previewWarningShown = true;
                 client.player.sendMessage(Text.literal("Cosmetic preview unavailable; you can still equip it."), true);
             }
         } finally {
