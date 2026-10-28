@@ -1,6 +1,7 @@
 package dev.voidcraft.cosmetics;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
@@ -18,6 +19,9 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        var discoveredPacks = CosmeticPackLoader.discover(FabricLoader.getInstance().getGameDir());
+        System.out.println("[VoidCraft Cosmetics] Valid cosmetic pack definitions found: " + discoveredPacks.size());
+
         openCosmeticsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.voidcraft_cosmetics.open_menu",
                 InputUtil.Type.KEYSYM,
