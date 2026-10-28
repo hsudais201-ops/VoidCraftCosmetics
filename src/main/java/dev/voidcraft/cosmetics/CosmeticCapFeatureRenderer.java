@@ -18,9 +18,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 /**
- * First visible rendering milestone: a simple 3D cap attached to the player head.
- * The purple wool texture is a temporary built-in texture; custom pack rendering
- * will replace this prototype in a later milestone.
+ * A basic 3D cap attached to the player's head. Uses Minecraft's purple wool
+ * texture as a temporary skin while custom pack texture loading is developed.
  */
 public final class CosmeticCapFeatureRenderer extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
     private static final Identifier TEXTURE = Identifier.of("minecraft", "textures/block/purple_wool.png");
@@ -33,9 +32,13 @@ public final class CosmeticCapFeatureRenderer extends FeatureRenderer<AbstractCl
         ModelPartData root = modelData.getRoot();
         root.addChild("cap", ModelPartBuilder.create()
                 .uv(0, 0)
-                .cuboid(-4.5F, -9.0F, -4.5F, 9.0F, 2.0F, 9.0F, new Dilation(0.0F)),
+                // Crown sits above the player's head.
+                .cuboid(-4.0F, -10.0F, -4.0F, 8.0F, 2.0F, 8.0F, new Dilation(0.0F))
+                // Wider brim gives the accessory a recognizable cap silhouette.
+                .uv(0, 10)
+                .cuboid(-5.0F, -8.5F, -5.0F, 10.0F, 1.0F, 10.0F, new Dilation(0.0F)),
                 ModelTransform.NONE);
-        this.cap = TexturedModelData.of(modelData, 16, 16).createModel().getChild("cap");
+        this.cap = TexturedModelData.of(modelData, 32, 16).createModel().getChild("cap");
     }
 
     public static void setEnabled(boolean value) {
