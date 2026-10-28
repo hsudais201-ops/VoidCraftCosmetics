@@ -24,8 +24,10 @@ import net.minecraft.util.math.RotationAxis;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -53,6 +55,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                 ModelData data = new ModelData();
                 ModelPartData root = data.getRoot();
                 int index = 0;
+                Map<String, float[]> baseRotations = new LinkedHashMap<>();
                 for (var part : definition.parts()) {
                     ModelPartBuilder builder = ModelPartBuilder.create();
                     for (var cube : part.cubes()) {
@@ -63,12 +66,18 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                     }
                     float[] p = part.origin();
                     float[] r = part.rotation();
-                    root.addChild("part_" + index++, builder, ModelTransform.of(p[0], p[1], p[2],
-                            (float) Math.toRadians(r[0]), (float) Math.toRadians(r[1]), (float) Math.toRadians(r[2])));
+                    String partName = part.name().replaceAll("[^a-zA-Z0-9_.-]", "_");
+                    if (partName.isBlank()) partName = "part";
+                    String uniqueName = partName + "_" + index++;
+                    float pitch = (float) Math.toRadians(r[0]);
+                    float yaw = (float) Math.toRadians(r[1]);
+                    float roll = (float) Math.toRadians(r[2]);
+                    root.addChild(uniqueName, builder, ModelTransform.of(p[0], p[1], p[2], pitch, yaw, roll));
+                    baseRotations.put(uniqueName, new float[] {pitch, yaw, roll});
                 }
                 ModelPart model = TexturedModelData.of(data, definition.textureWidth(), definition.textureHeight()).createModel();
                 Identifier texture = loadTexture(pack, definition.textureWidth(), definition.textureHeight());
-                return new LoadedPack(pack.id(), model, texture, pack.slot(), pack.animation());
+                return new LoadedPack(pack.id(), model, texture, pack.slot(), pack.animation(), Map.copyOf(baseRotations));
             } catch (IOException | RuntimeException e) {
                 LOG.warning("Could not render pack " + pack.id() + ": " + e.getMessage());
             }
@@ -169,17 +178,50 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         }
     }
 
-    private record LoadedPack(String id, ModelPart model, Identifier texture, String slot, String animation) {}
+    private record LoadedPack(String id, ModelPart model, Identifier texture, String slot, String animation,
+                              Map<String, float[]> baseRotations) {}
 
     private static void renderOnPart(MatrixStack matrices, VertexConsumerProvider consumers, int light,
                                      LoadedPack pack, ModelPart attachment, float animationProgress) {
         matrices.push();
         attachment.rotate(matrices);
         applyAnimation(matrices, pack.animation(), animationProgress);
+        applyNamedPartAnimations(pack, animationProgress);
         pack.model().render(matrices,
                 consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(pack.texture())),
                 light, OverlayTexture.DEFAULT_UV);
+        resetNamedPartAnimations(pack);
         matrices.pop();
+    }
+
+    private static void applyNamedPartAnimations(LoadedPack pack, float progress) {
+        float phase = progress * 0.08f;
+        for (var entry : pack.baseRotations().entrySet()) {
+            String name = entry.getKey().toLowerCase(java.util.Locale.ROOT);
+            ModelPart part = pack.model().getChild(entry.getKey());
+            float[] base = entry.getValue();
+            part.pitch = base[0];
+            part.yaw = base[1];
+            part.roll = base[2];
+            if (name.contains("left_wing") || name.contains("leftwing")) {
+                part.roll += (float) Math.sin(phase * 2.0f) * 0.48f;
+            } else if (name.contains("right_wing") || name.contains("rightwing")) {
+                part.roll -= (float) Math.sin(phase * 2.0f) * 0.48f;
+            } else if (name.contains("tail")) {
+                part.yaw += (float) Math.sin(phase) * 0.28f;
+                part.roll += (float) Math.sin(phase * 1.3f) * 0.16f;
+            }
+        }
+    }
+
+    private static void resetNamedPartAnimations(LoadedPack pack) {
+        for (var entry : pack.baseRotations().entrySet()) {
+            ModelPart part = pack.model().getChild(entry.getKey());
+            float[] base = entry.getValue();
+            part.pitch = base[0];
+            part.yaw = base[1];
+            part.roll = base[2];
+        }
     }
 
     private static void applyAnimation(MatrixStack matrices, String animation, float progress) {
