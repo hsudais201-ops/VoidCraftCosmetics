@@ -21,6 +21,7 @@ import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -63,7 +64,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                 }
                 ModelPart model = TexturedModelData.of(data, definition.textureWidth(), definition.textureHeight()).createModel();
                 Identifier texture = loadTexture(pack, definition.textureWidth(), definition.textureHeight());
-                return new LoadedPack(model, texture, pack.slot());
+                return new LoadedPack(model, texture, pack.slot(), pack.animation());
             } catch (IOException | RuntimeException e) {
                 LOG.warning("Could not render pack " + pack.id() + ": " + e.getMessage());
             }
@@ -118,16 +119,32 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         }
     }
 
-    private record LoadedPack(ModelPart model, Identifier texture, String slot) {}
+    private record LoadedPack(ModelPart model, Identifier texture, String slot, String animation) {}
 
     private static void renderOnPart(MatrixStack matrices, VertexConsumerProvider consumers, int light,
-                                      LoadedPack pack, ModelPart attachment) {
+                                      LoadedPack pack, ModelPart attachment, float animationProgress) {
         matrices.push();
         attachment.rotate(matrices);
+        applyAnimation(matrices, pack.animation(), animationProgress);
         pack.model().render(matrices,
                 consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(pack.texture())),
                 light, OverlayTexture.DEFAULT_UV);
         matrices.pop();
+    }
+
+    private static void applyAnimation(MatrixStack matrices, String animation, float progress) {
+        if (animation == null) return;
+        float phase = progress * 0.08f;
+        switch (animation.toLowerCase(java.util.Locale.ROOT)) {
+            case "bob" -> matrices.translate(0.0, Math.sin(phase) * 0.08, 0.0);
+            case "spin" -> matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(progress * 3.0f));
+            case "sway" -> matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Math.sin(phase) * 12.0f));
+            case "pulse" -> {
+                float scale = 1.0f + (float) Math.sin(phase) * 0.06f;
+                matrices.scale(scale, scale, scale);
+            }
+            default -> { }
+        }
     }
 
     @Override
@@ -137,11 +154,11 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         refreshSelectedPack();
         if (loaded == null || player.isInvisible()) return;
         switch (loaded.slot()) {
-            case "head" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().head);
-            case "body", "back" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().body);
+            case "head" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().head, animationProgress);
+            case "body", "back" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().body, animationProgress);
             case "legs" -> {
-                renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg);
-                renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg);
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg, animationProgress);
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg, animationProgress);
             }
             case "feet" -> {
                 renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg);
