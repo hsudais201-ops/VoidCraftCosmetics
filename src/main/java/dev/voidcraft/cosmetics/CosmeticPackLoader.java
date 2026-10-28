@@ -19,8 +19,8 @@ import java.util.logging.Logger;
 /**
  * Discovers user-installed cosmetic pack definitions.
  *
- * Discovers and validates metadata, model definitions, and safe asset paths.
- * The initial renderer currently supports custom head-slot packs only.
+ * Discovers and validates metadata, model definitions, and safe asset paths
+ * for the prototype's head, body, back, legs, and feet cosmetic slots.
  */
 public final class CosmeticPackLoader {
     private static final Logger LOGGER = Logger.getLogger("VoidCraftCosmetics");
