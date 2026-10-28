@@ -68,3 +68,8 @@ The loader now parses and validates a simple VoidCraft cuboid format. This is a 
 Each part requires a name, three-number origin, and one or more cubes. Rotation is optional and defaults to zero. Each cube requires a three-number origin, positive three-number size, and two-number UV origin. Texture dimensions must be between 1 and 4096; models are limited to 64 parts and 256 cubes. Coordinates must be finite and within +/-1024.
 
 **Texture rules:** PNG files must be at most 8 MiB, have dimensions no larger than 4096×4096, and exactly match `texture_size`. Each cube's UV origin and estimated UV rectangle must fit within the declared texture. Invalid packs are skipped and logged. Rendering has not yet been verified in an actual Minecraft session. This is prototype support for the declared slots, not a guarantee that arbitrary models will fit every player skin or animation.
+
+
+## In-game selection menu
+
+Press `M` to open the cosmetic selection screen. Use Previous/Next Cosmetic to choose an installed pack, then select Equip Selected. Turn Custom Cosmetic Off clears the custom pack selection. The built-in cap button cycles the built-in cap styles. `P` and `O` remain available as keyboard shortcuts.
