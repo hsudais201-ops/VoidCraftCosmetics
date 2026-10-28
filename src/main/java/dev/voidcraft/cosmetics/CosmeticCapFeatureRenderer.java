@@ -73,7 +73,7 @@ public final class CosmeticCapFeatureRenderer extends FeatureRenderer<AbstractCl
         matrices.push();
         getContextModel().head.rotate(matrices);
         cap.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURES[selectedStyle - 1])),
-                light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
+                light, OverlayTexture.DEFAULT_UV);
         matrices.pop();
     }
 }
