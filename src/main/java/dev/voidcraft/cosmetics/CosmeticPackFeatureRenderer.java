@@ -161,8 +161,8 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                 renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg, animationProgress);
             }
             case "feet" -> {
-                renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg);
-                renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg);
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg, animationProgress);
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg, animationProgress);
             }
             default -> { }
         }
