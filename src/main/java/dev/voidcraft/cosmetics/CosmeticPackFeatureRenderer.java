@@ -38,6 +38,8 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
     // Reuse decoded models and registered textures when equip state changes.
     private final java.util.Map<String, LoadedPack> loadedPackCache = new java.util.LinkedHashMap<>();
     private String loadedIds = "";
+    private long loadedPackRevision = -1;
+    private static long packRevision = 0;
     private static final Set<String> selectedPackIds = new LinkedHashSet<>();
 
     public CosmeticPackFeatureRenderer(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context, List<CosmeticPackLoader.CosmeticPack> packs) {
@@ -137,9 +139,17 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         return next.name();
     }
 
+    public static void notifyPacksReloaded() {
+        packRevision++;
+    }
+
     private void refreshSelectedPacks() {
         String ids = String.join(",", selectedPackIds);
-        if (loadedIds.equals(ids)) return;
+        if (loadedIds.equals(ids) && loadedPackRevision == packRevision) return;
+        if (loadedPackRevision != packRevision) {
+            loadedPackCache.clear();
+            loadedPackRevision = packRevision;
+        }
         loadedIds = ids;
         loadedPacks.clear();
         for (String id : selectedPackIds) {
