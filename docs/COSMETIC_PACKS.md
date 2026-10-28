@@ -35,6 +35,7 @@ Validation currently checks:
 - `id` uses lowercase letters, digits, underscores, dots or hyphens and is unique across discovered packs.
 - `slot` is one of `head`, `body`, `back`, `legs` or `feet`.
 - The model path ends in `.json`, the texture path ends in `.png`, and both files exist.
-- Asset paths stay inside the cosmetics directory.
+- Asset paths must be relative and stay inside the cosmetics directory, including after resolving symbolic links.
+- Definition files linked from outside the cosmetics directory are skipped.
 
 **Important:** this is still pack metadata validation only. The model JSON is not parsed and custom pack models/textures are not yet connected to the in-game renderer. The visible prototype cap is a separate built-in 3D mesh using Minecraft's purple wool texture, toggled with **O**. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
