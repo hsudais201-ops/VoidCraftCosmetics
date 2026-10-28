@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -26,13 +27,14 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
     private KeyBinding cycleCosmeticsKey;
     private KeyBinding cycleCustomPackKey;
     private KeyBinding openCosmeticsMenuKey;
-    private List<CosmeticPackLoader.CosmeticPack> discoveredPacks = List.of();
+    private final List<CosmeticPackLoader.CosmeticPack> discoveredPacks = new ArrayList<>();
+    private Path gameDirectory;
     private Path settingsFile;
 
     @Override
     public void onInitializeClient() {
-        Path gameDirectory = FabricLoader.getInstance().getGameDir();
-        discoveredPacks = CosmeticPackLoader.discover(gameDirectory);
+        gameDirectory = FabricLoader.getInstance().getGameDir();
+        discoveredPacks.addAll(CosmeticPackLoader.discover(gameDirectory));
         LOGGER.info("Valid cosmetic pack definitions found: " + discoveredPacks.size());
 
         settingsFile = gameDirectory.resolve("config").resolve("voidcraft-cosmetics").resolve("settings.properties");
@@ -69,7 +71,7 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openCosmeticsMenuKey.wasPressed()) {
                 if (client.currentScreen == null) {
-                    client.setScreen(new CosmeticSelectionScreen(null, discoveredPacks, this::saveSettings));
+                    client.setScreen(new CosmeticSelectionScreen(null, discoveredPacks, this::saveSettings, this::reloadPacks));
                 }
             }
             while (cycleCustomPackKey.wasPressed()) {
@@ -87,6 +89,25 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
                 }
             }
         });
+    }
+
+
+    private void reloadPacks() {
+        List<CosmeticPackLoader.CosmeticPack> refreshed = CosmeticPackLoader.discover(gameDirectory);
+        discoveredPacks.clear();
+        discoveredPacks.addAll(refreshed);
+        List<String> validIds = discoveredPacks.stream().map(CosmeticPackLoader.CosmeticPack::id).toList();
+        List<String> equippedIds = CosmeticPackFeatureRenderer.getSelectedPackIds().stream()
+                .filter(validIds::contains)
+                .toList();
+        CosmeticPackFeatureRenderer.setSelectedPackIds(equippedIds);
+        CosmeticPackFeatureRenderer.notifyPacksReloaded();
+        saveSettings();
+        LOGGER.info("Reloaded cosmetic packs: " + discoveredPacks.size());
+        if (net.minecraft.client.MinecraftClient.getInstance().player != null) {
+            net.minecraft.client.MinecraftClient.getInstance().player.sendMessage(
+                    Text.literal("Reloaded cosmetic packs: " + discoveredPacks.size()), true);
+        }
     }
 
     private void loadSettings() {
