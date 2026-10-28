@@ -38,7 +38,7 @@ Validation currently checks:
 - Asset paths must be relative and stay inside the cosmetics directory, including after resolving symbolic links.
 - Definition files linked from outside the cosmetics directory are skipped.
 
-**Important:** this is still pack metadata validation only. The model JSON is not parsed and custom pack models/textures are not yet connected to the in-game renderer. The visible prototype cap is a separate built-in 3D mesh using Minecraft's purple wool texture, toggled with **O**. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
+**Current renderer status:** valid `head` packs with this custom model schema and a matching PNG texture have an initial renderer. Press **P** to cycle through discovered head packs and then **Off**. Press **O** to cycle the separate built-in cap styles. Other slots are validated but are not rendered yet. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
 
 ## Supported model JSON schema (version 1)
 
@@ -67,4 +67,4 @@ The loader now parses and validates a simple VoidCraft cuboid format. This is a 
 
 Each part requires a name, three-number origin, and one or more cubes. Rotation is optional and defaults to zero. Each cube requires a three-number origin, positive three-number size, and two-number UV origin. Texture dimensions must be between 1 and 4096; models are limited to 64 parts and 256 cubes. Coordinates must be finite and within +/-1024.
 
-**Current status:** this schema is parsed and validated during pack discovery, but the parsed geometry is not yet rendered. Texture PNG dimensions/content are not yet loaded by the mod.
+**Texture rules:** PNG files must be at most 8 MiB, have dimensions no larger than 4096×4096, and exactly match `texture_size`. Each cube's UV origin and estimated UV rectangle must fit within the declared texture. Invalid packs are skipped and logged. Rendering has not yet been verified in an actual Minecraft session.
