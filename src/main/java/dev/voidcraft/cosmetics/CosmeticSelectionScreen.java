@@ -71,7 +71,7 @@ public final class CosmeticSelectionScreen extends Screen {
     private void refreshPackLabel() {
         if (client != null && client.player != null) {
             String name = packIndex < 0 || packs.isEmpty() ? "Off" : packs.get(packIndex).name();
-            client.player.sendMessage(Text.literal("Selected preview: " + name), true);
+            client.player.sendMessage(Text.literal("Highlighted cosmetic: " + name), true);
         }
     }
 
@@ -80,8 +80,12 @@ public final class CosmeticSelectionScreen extends Screen {
         renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         String selected = packIndex < 0 || packs.isEmpty() ? "Off" : packs.get(packIndex).name();
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Custom cosmetic: " + selected), width / 2, height / 2 - 88, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Found packs: " + packs.size() + " | P cycles packs, O cycles cap"), width / 2, height / 2 + 66, 0xAAAAAA);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Highlighted cosmetic: " + selected), width / 2, height / 2 - 88, 0xFFFFFF);
+        if (packIndex >= 0 && packIndex < packs.size()) {
+            CosmeticPackLoader.CosmeticPack pack = packs.get(packIndex);
+            context.drawCenteredTextWithShadow(textRenderer, Text.literal("Slot: " + pack.slot() + " | Animation: " + (pack.animation().isBlank() ? "none" : pack.animation())), width / 2, height / 2 - 72, 0xCCCCFF);
+        }
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Installed packs: " + packs.size()), width / 2, height / 2 + 66, 0xAAAAAA);
         if (packs.isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer, Text.literal("Add pack JSON, model JSON and PNG under config/voidcraft-cosmetics"), width / 2, height / 2 + 80, 0xFFCC66);
         }
