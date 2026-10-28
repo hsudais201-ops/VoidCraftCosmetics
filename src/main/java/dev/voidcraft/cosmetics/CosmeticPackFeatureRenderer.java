@@ -33,6 +33,8 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
     private static final Logger LOG = Logger.getLogger("VoidCraftCosmetics");
     private final List<CosmeticPackLoader.CosmeticPack> packs;
     private final java.util.Map<String, LoadedPack> loadedPacks = new java.util.LinkedHashMap<>();
+    // Reuse decoded models and registered textures when equip state changes.
+    private final java.util.Map<String, LoadedPack> loadedPackCache = new java.util.LinkedHashMap<>();
     private String loadedIds = "";
     private static final Set<String> selectedPackIds = new LinkedHashSet<>();
 
@@ -132,7 +134,11 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         loadedIds = ids;
         loadedPacks.clear();
         for (String id : selectedPackIds) {
-            LoadedPack pack = buildSelected(id);
+            LoadedPack pack = loadedPackCache.get(id);
+            if (pack == null) {
+                pack = buildSelected(id);
+                if (pack != null) loadedPackCache.put(id, pack);
+            }
             if (pack != null) loadedPacks.put(id, pack);
         }
     }
