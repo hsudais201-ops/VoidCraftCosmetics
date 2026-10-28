@@ -57,7 +57,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                             (float)Math.toRadians(r[0]), (float)Math.toRadians(r[1]), (float)Math.toRadians(r[2])));
                 }
                 ModelPart model = TexturedModelData.of(data, definition.textureWidth(), definition.textureHeight()).createModel();
-                Identifier texture = loadTexture(pack);
+                Identifier texture = loadTexture(pack, definition.textureWidth(), definition.textureHeight());
                 return new LoadedPack(model, texture);
             } catch (IOException | RuntimeException e) {
                 LOG.warning("Could not render pack " + pack.id() + ": " + e.getMessage());
@@ -66,7 +66,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         return null;
     }
 
-    private static Identifier loadTexture(CosmeticPackLoader.CosmeticPack pack) throws IOException {
+    private static Identifier loadTexture(CosmeticPackLoader.CosmeticPack pack, int expectedWidth, int expectedHeight) throws IOException {
         if (Files.size(pack.texturePath()) > 8L * 1024L * 1024L) {
             throw new IOException("texture PNG exceeds 8 MiB limit");
         }
@@ -77,6 +77,10 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         if (image.getWidth() < 1 || image.getHeight() < 1 || image.getWidth() > 4096 || image.getHeight() > 4096) {
             image.close();
             throw new IOException("texture dimensions must be between 1 and 4096");
+        }
+        if (image.getWidth() != expectedWidth || image.getHeight() != expectedHeight) {
+            image.close();
+            throw new IOException("PNG dimensions must match model texture_size (" + expectedWidth + "x" + expectedHeight + ")");
         }
         NativeImageBackedTexture nativeTexture = new NativeImageBackedTexture(image);
         try {
