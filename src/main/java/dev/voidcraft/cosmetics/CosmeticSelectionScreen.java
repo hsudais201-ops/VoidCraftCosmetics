@@ -11,13 +11,15 @@ public final class CosmeticSelectionScreen extends Screen {
     private final Screen parent;
     private final List<CosmeticPackLoader.CosmeticPack> packs;
     private final Runnable saveSettings;
+    private final Runnable reloadPacks;
     private int packIndex;
 
-    public CosmeticSelectionScreen(Screen parent, List<CosmeticPackLoader.CosmeticPack> packs, Runnable saveSettings) {
+    public CosmeticSelectionScreen(Screen parent, List<CosmeticPackLoader.CosmeticPack> packs, Runnable saveSettings, Runnable reloadPacks) {
         super(Text.literal("VoidCraft Cosmetics"));
         this.parent = parent;
         this.packs = List.copyOf(packs);
         this.saveSettings = saveSettings;
+        this.reloadPacks = reloadPacks;
         String selected = CosmeticPackFeatureRenderer.getSelectedPackId();
         this.packIndex = -1;
         for (int i = 0; i < this.packs.size(); i++) {
@@ -64,8 +66,10 @@ public final class CosmeticSelectionScreen extends Screen {
             saveSettings.run();
             clearAndInit();
         }).dimensions(center - 105, y + 56, 210, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Reload installed packs"), button -> reloadPacks.run())
+                .dimensions(center - 105, y + 84, 130, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), button -> close())
-                .dimensions(center - 50, y + 84, 100, 20).build());
+                .dimensions(center + 30, y + 84, 75, 20).build());
     }
 
     private void refreshPackLabel() {
