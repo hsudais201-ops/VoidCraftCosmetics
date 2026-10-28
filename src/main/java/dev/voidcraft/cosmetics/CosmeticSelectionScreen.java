@@ -46,7 +46,7 @@ public final class CosmeticSelectionScreen extends Screen {
         }).dimensions(center + 5, y, 100, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Equip selected"), button -> {
             if (packIndex >= 0 && packIndex < packs.size()) {
-                CosmeticPackFeatureRenderer.setSelectedPackId(packs.get(packIndex).id());
+                CosmeticPackFeatureRenderer.equipPackId(packs.get(packIndex).id());
                 saveSettings.run();
                 if (client != null && client.player != null) {
                     client.player.sendMessage(Text.literal("Equipped cosmetic: " + packs.get(packIndex).name()), true);
@@ -54,7 +54,7 @@ public final class CosmeticSelectionScreen extends Screen {
             }
         }).dimensions(center - 105, y + 28, 100, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Turn custom cosmetic off"), button -> {
-            CosmeticPackFeatureRenderer.setSelectedPackId("");
+            CosmeticPackFeatureRenderer.clearSelectedPacks();
             packIndex = -1;
             saveSettings.run();
             refreshPackLabel();
