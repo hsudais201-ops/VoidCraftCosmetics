@@ -102,6 +102,10 @@ public final class CosmeticPackLoader {
                 throw new IllegalArgumentException("texture file not found: " + texture);
             }
 
+            CosmeticModelDefinition.Definition parsedModel = CosmeticModelDefinition.read(modelPath);
+            LOGGER.info("Validated model for " + id + ": " + parsedModel.parts().size()
+                    + " parts, " + parsedModel.cubeCount() + " cubes");
+
             String animation = json.has("animation") && !json.get("animation").isJsonNull()
                     ? json.get("animation").getAsString() : "";
             packs.add(new CosmeticPack(id, name, slot, modelPath, texturePath, animation));
