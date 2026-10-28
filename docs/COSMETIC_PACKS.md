@@ -38,11 +38,11 @@ Validation currently checks:
 - Asset paths must be relative and stay inside the cosmetics directory, including after resolving symbolic links.
 - Definition files linked from outside the cosmetics directory are skipped.
 
-**Current renderer status:** the prototype attempts to render the selected pack for all five declared slots. Press **P** to cycle through discovered packs and then **Off**; this shortcut selects one pack at a time, while the menu supports multiple equipped packs. Press **O** to cycle the separate built-in cap styles. Head packs attach to the head; body/back attach to the torso; leg/feet packs are drawn at both leg pivots. This is an early attachment strategy, not a polished anatomical fitting system—models may need slot-specific coordinates and may overlap. Basic named animation presets are supported: `""` (none), `bob`, `spin`, `sway`, and `pulse`. These are simple renderer transforms, not a full keyframe animation system. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
+**Current renderer status:** the prototype attempts to render custom packs for all five declared slots. Press **P** to cycle through discovered packs and then **Off**; this shortcut selects one pack at a time, while the menu supports multiple equipped packs. Press **O** to cycle the separate built-in cap styles. Head packs attach to the head; body/back attach to the torso; leg/feet packs are drawn at both leg pivots. This is an early attachment strategy, not a polished anatomical fitting system—models may need slot-specific coordinates and may overlap. Basic named animation presets are supported: `""` (none), `bob`, `spin`, `sway`, and `pulse`. These are simple renderer transforms, not a full keyframe animation system. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
 
 ## Supported model JSON schema (version 1)
 
-The loader now parses and validates a simple VoidCraft cuboid format. This is a small custom format, **not** a Blockbench export format. Example model file:
+The loader parses and validates a simple VoidCraft cuboid format. This is a small custom format, **not** a Blockbench export format. Example model file:
 
 ```json
 {
@@ -69,7 +69,8 @@ Each part requires a name, three-number origin, and one or more cubes. Rotation 
 
 **Texture rules:** PNG files must be at most 8 MiB, have dimensions no larger than 4096×4096, and exactly match `texture_size`. Each cube's UV origin and estimated UV rectangle must fit within the declared texture. Invalid packs are skipped and logged. Rendering has not yet been verified in an actual Minecraft session. This is prototype support for the declared slots, not a guarantee that arbitrary models will fit every player skin or animation.
 
-
 ## In-game selection menu
 
-Press `M` to open the cosmetic selection screen. Use Previous/Next Cosmetic to choose an installed pack, then select Equip Selected. Turn Custom Cosmetic Off clears the custom pack selection. The built-in cap button cycles the built-in cap styles. `P` and `O` remain available as keyboard shortcuts.
+Press `M` to open the cosmetic selection screen. Use **Previous Cosmetic** and **Next Cosmetic** to highlight an installed pack. **Equip Selected** adds it without removing other equipped packs. **Unequip Selected** removes only the highlighted pack. **Turn Custom Cosmetic Off** clears all equipped custom packs. The menu lists the currently equipped pack names and the total number of discovered packs. The built-in cap button cycles the separate built-in cap styles. `P` and `O` remain available as keyboard shortcuts.
+
+The menu currently lists names and metadata; it does not yet show a live 3D preview. Custom pack rendering and menu interaction still need in-game testing. This repository builds a Fabric mod JAR, not an Android APK. Other players will not necessarily see your cosmetics in multiplayer unless they have compatible client-side support or a compatible server/network synchronization system is added.
