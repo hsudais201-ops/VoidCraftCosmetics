@@ -18,12 +18,18 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 /**
- * A basic 3D cap attached to the player's head. Uses Minecraft's purple wool
- * texture as a temporary skin while custom pack texture loading is developed.
+ * Built-in 3D cap preview. Press O to cycle through the available styles.
+ * Custom pack rendering is not implemented yet.
  */
 public final class CosmeticCapFeatureRenderer extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
-    private static final Identifier TEXTURE = Identifier.of("minecraft", "textures/block/purple_wool.png");
-    private static boolean enabled = true;
+    private static final Identifier[] TEXTURES = {
+            Identifier.of("minecraft", "textures/block/purple_wool.png"),
+            Identifier.of("minecraft", "textures/block/red_wool.png"),
+            Identifier.of("minecraft", "textures/block/blue_wool.png"),
+            Identifier.of("minecraft", "textures/block/black_wool.png")
+    };
+    private static final String[] STYLE_NAMES = {"Purple", "Red", "Blue", "Black"};
+    private static int selectedStyle = 0;
     private final ModelPart cap;
 
     public CosmeticCapFeatureRenderer(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context) {
@@ -32,30 +38,36 @@ public final class CosmeticCapFeatureRenderer extends FeatureRenderer<AbstractCl
         ModelPartData root = modelData.getRoot();
         root.addChild("cap", ModelPartBuilder.create()
                 .uv(0, 0)
-                // Crown sits above the player's head.
                 .cuboid(-4.0F, -10.0F, -4.0F, 8.0F, 2.0F, 8.0F, new Dilation(0.0F))
-                // Wider brim gives the accessory a recognizable cap silhouette.
                 .uv(0, 10)
                 .cuboid(-5.0F, -8.5F, -5.0F, 10.0F, 1.0F, 10.0F, new Dilation(0.0F)),
                 ModelTransform.NONE);
         this.cap = TexturedModelData.of(modelData, 32, 16).createModel().getChild("cap");
     }
 
-    public static void setEnabled(boolean value) {
-        enabled = value;
+    /** Cycles through four built-in texture styles and then turns the cap off. */
+    public static String cycleStyle() {
+        selectedStyle++;
+        if (selectedStyle > TEXTURES.length) {
+            selectedStyle = 0;
+        }
+        return getStyleName();
+    }
+
+    public static String getStyleName() {
+        return selectedStyle == 0 ? "Off" : STYLE_NAMES[selectedStyle - 1];
     }
 
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
                        AbstractClientPlayerEntity player, float limbAngle, float limbDistance,
                        float tickDelta, float animationProgress, float headYaw, float headPitch) {
-        if (!enabled || player.isInvisible()) {
+        if (selectedStyle == 0 || player.isInvisible()) {
             return;
         }
-
         matrices.push();
         getContextModel().head.rotate(matrices);
-        cap.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE)),
+        cap.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURES[selectedStyle - 1])),
                 light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
         matrices.pop();
     }
