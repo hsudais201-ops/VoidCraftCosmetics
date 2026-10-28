@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "voidcraft_cosmetics",
+  "version": "${version}",
+  "name": "VoidCraft Cosmetics",
+  "description": "A client-side cosmetics framework for custom player accessories.",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.voidcraft.cosmetics.VoidCraftCosmeticsClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.5",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
