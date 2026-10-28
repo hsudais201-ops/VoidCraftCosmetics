@@ -107,7 +107,11 @@ public final class CosmeticPackLoader {
                     + " parts, " + parsedModel.cubeCount() + " cubes");
 
             String animation = json.has("animation") && !json.get("animation").isJsonNull()
-                    ? json.get("animation").getAsString() : "";
+                    ? json.get("animation").getAsString().toLowerCase(Locale.ROOT) : "";
+            if (!List.of("", "bob", "spin", "sway", "pulse").contains(animation)) {
+                throw new IllegalArgumentException("unsupported animation preset: " + animation
+                        + " (supported: bob, spin, sway, pulse, or empty)");
+            }
             packs.add(new CosmeticPack(id, name, slot, modelPath, texturePath, animation));
             ids.add(id);
             LOGGER.info("Found cosmetic pack definition: " + id + " (" + name + ")");
