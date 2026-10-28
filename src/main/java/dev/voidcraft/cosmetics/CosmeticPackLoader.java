@@ -52,6 +52,15 @@ public final class CosmeticPackLoader {
     }
 
     private static void readDefinition(Path root, Path definition, List<CosmeticPack> packs, Set<String> ids) {
+        try {
+            if (!definition.toRealPath().startsWith(root.toRealPath())) {
+                throw new IllegalArgumentException("definition symlink must stay inside the cosmetics folder");
+            }
+        } catch (IOException exception) {
+            LOGGER.log(Level.WARNING, "Could not resolve cosmetic definition: " + definition, exception);
+            return;
+        }
+
         try (Reader reader = Files.newBufferedReader(definition)) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 
@@ -113,10 +122,21 @@ public final class CosmeticPackLoader {
         return json.get(key).getAsString();
     }
 
-    private static Path safeResolve(Path root, String relative) {
-        Path resolved = root.resolve(relative).normalize();
+    private static Path safeResolve(Path root, String relative) throws IOException {
+        Path supplied = Path.of(relative);
+        if (supplied.isAbsolute()) {
+            throw new IllegalArgumentException("asset paths must be relative");
+        }
+        Path resolved = root.resolve(supplied).normalize();
         if (!resolved.startsWith(root)) {
             throw new IllegalArgumentException("path must stay inside the cosmetics folder");
+        }
+        if (Files.exists(resolved)) {
+            Path realRoot = root.toRealPath();
+            Path realResolved = resolved.toRealPath();
+            if (!realResolved.startsWith(realRoot)) {
+                throw new IllegalArgumentException("asset symlink must stay inside the cosmetics folder");
+            }
         }
         return resolved;
     }
