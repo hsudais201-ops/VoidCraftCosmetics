@@ -7,11 +7,12 @@ The GitHub Actions workflow builds the project with Java 21 and uploads the JAR 
 
 ## Implemented prototype features
 - Fabric client entrypoint.
-- A basic 3D cap mesh is attached to the player head through Fabric's feature-renderer registration callback.
-- Press **O** in game to toggle the cap on or off.
-- The prototype cap uses Minecraft's built-in purple wool texture; it is not yet a user-selectable cosmetic.
+- A 3D cap mesh is attached to the player head through Fabric's feature-renderer registration callback.
+- Press **O** to cycle through **Off**, **Purple**, **Red**, **Blue**, and **Black** cap styles.
+- Cap styles use built-in Minecraft wool textures; no extra texture files are required for these previews.
+- Cosmetic pack definitions are discovered recursively under `config/voidcraft-cosmetics/` and validated for supported fields, duplicate IDs, file extensions, and safe paths.
 
 ## Not implemented yet
-Custom pack models and textures are discovered and validated but not rendered. A cosmetics selection screen, cap texture customization, wings/capes, animations, and network synchronization remain future work. Other players will only see a cosmetic when their client has compatible rendering/data support; this prototype does not synchronize equipped cosmetics.
+Custom pack models and textures are not rendered; the pack loader currently validates their metadata and file references only. A full cosmetics selection screen, user-provided texture loading, capes/wings/tails/horns, animated models, and network synchronization remain future work. Other players will only see cosmetics when their client has compatible rendering/data support; this prototype does not synchronize equipped cosmetics.
 
 Target: Fabric / Minecraft 1.21.1 / Java 21.
