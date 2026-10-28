@@ -28,19 +28,21 @@ import java.util.logging.Logger;
 public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
     private static final Logger LOG = Logger.getLogger("VoidCraftCosmetics");
     private static final Identifier FALLBACK = Identifier.of("minecraft", "textures/block/purple_wool.png");
-    private final ModelPart model;
-    private final Identifier texture;
+    private final List<CosmeticPackLoader.CosmeticPack> packs;
+    private LoadedPack loaded;
+    private String loadedId = "";
+    private static String selectedPackId = "";
 
     public CosmeticPackFeatureRenderer(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context, List<CosmeticPackLoader.CosmeticPack> packs) {
         super(context);
-        LoadedPack loaded = build(packs);
-        this.model = loaded == null ? null : loaded.model();
-        this.texture = loaded == null ? FALLBACK : loaded.texture();
+        this.packs = packs;
+        refreshSelectedPack();
     }
 
-    private static LoadedPack build(List<CosmeticPackLoader.CosmeticPack> packs) {
+    private LoadedPack buildSelected(String selectedId) {
+        if (selectedId == null || selectedId.isBlank()) return null;
         for (var pack : packs) {
-            if (!pack.slot().equals("head")) continue;
+            if (!pack.slot().equals("head") || !pack.id().equals(selectedId)) continue;
             try {
                 var definition = CosmeticModelDefinition.read(pack.modelPath());
                 ModelData data = new ModelData();
@@ -67,6 +69,27 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
             }
         }
         return null;
+    }
+
+    public static String getSelectedPackId() { return selectedPackId; }
+
+    public static void setSelectedPackId(String id) { selectedPackId = id == null ? "" : id; }
+
+    public static String cycleSelectedPack(List<CosmeticPackLoader.CosmeticPack> packs) {
+        List<CosmeticPackLoader.CosmeticPack> headPacks = packs.stream().filter(p -> p.slot().equals("head")).toList();
+        if (headPacks.isEmpty()) { selectedPackId = ""; return "No valid head cosmetic packs found"; }
+        int current = -1;
+        for (int i = 0; i < headPacks.size(); i++) if (headPacks.get(i).id().equals(selectedPackId)) current = i;
+        if (current + 1 >= headPacks.size()) { selectedPackId = ""; return "Off"; }
+        var next = headPacks.get(current + 1);
+        selectedPackId = next.id();
+        return next.name();
+    }
+
+    private void refreshSelectedPack() {
+        if (loadedId.equals(selectedPackId)) return;
+        loadedId = selectedPackId;
+        loaded = buildSelected(loadedId);
     }
 
     private static Identifier loadTexture(CosmeticPackLoader.CosmeticPack pack, int expectedWidth, int expectedHeight) throws IOException {
@@ -101,10 +124,11 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
     public void render(MatrixStack matrices, VertexConsumerProvider consumers, int light,
                        AbstractClientPlayerEntity player, float limbAngle, float limbDistance,
                        float tickDelta, float animationProgress, float headYaw, float headPitch) {
-        if (model == null || player.isInvisible()) return;
+        refreshSelectedPack();
+        if (loaded == null || player.isInvisible()) return;
         matrices.push();
         getContextModel().head.rotate(matrices);
-        model.render(matrices, consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(texture)), light, OverlayTexture.DEFAULT_UV);
+        loaded.model().render(matrices, consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(loaded.texture())), light, OverlayTexture.DEFAULT_UV);
         matrices.pop();
     }
 }
