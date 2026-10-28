@@ -96,7 +96,12 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
                 properties.load(input);
                 int index = Integer.parseInt(properties.getProperty("capStyle", "1"));
                 CosmeticCapFeatureRenderer.setSelectedStyleIndex(index);
-                CosmeticPackFeatureRenderer.setSelectedPackId(properties.getProperty("selectedPackId", ""));
+                String selectedIds = properties.getProperty("selectedPackIds", "");
+                if (!selectedIds.isBlank()) {
+                    CosmeticPackFeatureRenderer.setSelectedPackIds(java.util.Arrays.asList(selectedIds.split(",")));
+                } else {
+                    CosmeticPackFeatureRenderer.setSelectedPackId(properties.getProperty("selectedPackId", ""));
+                }
             } catch (IOException | NumberFormatException exception) {
                 LOGGER.log(Level.WARNING, "Could not read cosmetics settings; using default style", exception);
             }
@@ -112,6 +117,7 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
             Properties properties = new Properties();
             properties.setProperty("capStyle", Integer.toString(CosmeticCapFeatureRenderer.getSelectedStyleIndex()));
             properties.setProperty("selectedPackId", CosmeticPackFeatureRenderer.getSelectedPackId());
+            properties.setProperty("selectedPackIds", String.join(",", CosmeticPackFeatureRenderer.getSelectedPackIds()));
             try (OutputStream output = Files.newOutputStream(settingsFile)) {
                 properties.store(output, "VoidCraft Cosmetics settings");
             }
