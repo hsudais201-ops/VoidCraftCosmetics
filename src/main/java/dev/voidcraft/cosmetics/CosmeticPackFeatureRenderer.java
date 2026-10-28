@@ -42,7 +42,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
     private LoadedPack buildSelected(String selectedId) {
         if (selectedId == null || selectedId.isBlank()) return null;
         for (var pack : packs) {
-            if (!pack.slot().equals("head") || !pack.id().equals(selectedId)) continue;
+            if (!pack.id().equals(selectedId)) continue;
             try {
                 var definition = CosmeticModelDefinition.read(pack.modelPath());
                 ModelData data = new ModelData();
@@ -63,7 +63,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                 }
                 ModelPart model = TexturedModelData.of(data, definition.textureWidth(), definition.textureHeight()).createModel();
                 Identifier texture = loadTexture(pack, definition.textureWidth(), definition.textureHeight());
-                return new LoadedPack(model, texture);
+                return new LoadedPack(model, texture, pack.slot());
             } catch (IOException | RuntimeException e) {
                 LOG.warning("Could not render pack " + pack.id() + ": " + e.getMessage());
             }
@@ -76,12 +76,12 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
     public static void setSelectedPackId(String id) { selectedPackId = id == null ? "" : id; }
 
     public static String cycleSelectedPack(List<CosmeticPackLoader.CosmeticPack> packs) {
-        List<CosmeticPackLoader.CosmeticPack> headPacks = packs.stream().filter(p -> p.slot().equals("head")).toList();
-        if (headPacks.isEmpty()) { selectedPackId = ""; return "No valid head cosmetic packs found"; }
+        List<CosmeticPackLoader.CosmeticPack> availablePacks = List.copyOf(packs);
+        if (availablePacks.isEmpty()) { selectedPackId = ""; return "No valid cosmetic packs found"; }
         int current = -1;
-        for (int i = 0; i < headPacks.size(); i++) if (headPacks.get(i).id().equals(selectedPackId)) current = i;
-        if (current + 1 >= headPacks.size()) { selectedPackId = ""; return "Off"; }
-        var next = headPacks.get(current + 1);
+        for (int i = 0; i < availablePacks.size(); i++) if (availablePacks.get(i).id().equals(selectedPackId)) current = i;
+        if (current + 1 >= availablePacks.size()) { selectedPackId = ""; return "Off"; }
+        var next = availablePacks.get(current + 1);
         selectedPackId = next.id();
         return next.name();
     }
@@ -118,7 +118,17 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         }
     }
 
-    private record LoadedPack(ModelPart model, Identifier texture) {}
+    private record LoadedPack(ModelPart model, Identifier texture, String slot) {}
+
+    private static void renderOnPart(MatrixStack matrices, VertexConsumerProvider consumers, int light,
+                                      LoadedPack pack, ModelPart attachment) {
+        matrices.push();
+        attachment.rotate(matrices);
+        pack.model().render(matrices,
+                consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(pack.texture())),
+                light, OverlayTexture.DEFAULT_UV);
+        matrices.pop();
+    }
 
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider consumers, int light,
@@ -126,9 +136,18 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                        float tickDelta, float animationProgress, float headYaw, float headPitch) {
         refreshSelectedPack();
         if (loaded == null || player.isInvisible()) return;
-        matrices.push();
-        getContextModel().head.rotate(matrices);
-        loaded.model().render(matrices, consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(loaded.texture())), light, OverlayTexture.DEFAULT_UV);
-        matrices.pop();
+        switch (loaded.slot()) {
+            case "head" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().head);
+            case "body", "back" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().body);
+            case "legs" -> {
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg);
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg);
+            }
+            case "feet" -> {
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg);
+                renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg);
+            }
+            default -> { }
+        }
     }
 }
