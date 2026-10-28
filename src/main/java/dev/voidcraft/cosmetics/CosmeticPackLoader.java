@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * Discovers user-installed cosmetic pack definitions.
  *
  * Discovers and validates metadata, model definitions, and safe asset paths
- * for the prototype's head, body, back, legs, and feet cosmetic slots.
+ * for the prototype's head, horns, body, back, cape, wings, tail, legs, and feet cosmetic slots.
  */
 public final class CosmeticPackLoader {
     private static final Logger LOGGER = Logger.getLogger("VoidCraftCosmetics");
@@ -83,7 +83,7 @@ public final class CosmeticPackLoader {
             if (ids.contains(id)) {
                 throw new IllegalArgumentException("duplicate cosmetic id: " + id);
             }
-            if (!List.of("head", "body", "back", "legs", "feet").contains(slot)) {
+            if (!List.of("head", "horns", "body", "back", "cape", "wings", "tail", "legs", "feet").contains(slot)) {
                 throw new IllegalArgumentException("unsupported slot: " + slot);
             }
             if (!model.toLowerCase(Locale.ROOT).endsWith(".json")) {
