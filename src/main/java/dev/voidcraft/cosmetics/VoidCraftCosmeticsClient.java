@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,14 +25,14 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
     private static final Logger LOGGER = Logger.getLogger("VoidCraftCosmetics");
     private KeyBinding cycleCosmeticsKey;
     private KeyBinding cycleCustomPackKey;
-    private java.util.List<CosmeticPackLoader.CosmeticPack> discoveredPacks = java.util.List.of();
+    private List<CosmeticPackLoader.CosmeticPack> discoveredPacks = List.of();
     private Path settingsFile;
 
     @Override
     public void onInitializeClient() {
         Path gameDirectory = FabricLoader.getInstance().getGameDir();
         discoveredPacks = CosmeticPackLoader.discover(gameDirectory);
-        System.out.println("[VoidCraft Cosmetics] Valid cosmetic pack definitions found: " + discoveredPacks.size());
+        LOGGER.info("Valid cosmetic pack definitions found: " + discoveredPacks.size());
 
         settingsFile = gameDirectory.resolve("config").resolve("voidcraft-cosmetics").resolve("settings.properties");
         loadSettings();
