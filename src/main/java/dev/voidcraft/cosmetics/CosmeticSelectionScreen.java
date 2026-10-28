@@ -48,11 +48,15 @@ public final class CosmeticSelectionScreen extends Screen {
         }).dimensions(center + 5, y, 100, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Equip selected"), button -> {
             if (packIndex >= 0 && packIndex < packs.size()) {
-                CosmeticPackFeatureRenderer.equipPackId(packs.get(packIndex).id());
+                CosmeticPackLoader.CosmeticPack pack = packs.get(packIndex);
+                boolean wasEquipped = CosmeticPackFeatureRenderer.getSelectedPackIds().contains(pack.id());
+                CosmeticPackFeatureRenderer.equipPackId(pack.id());
                 saveSettings.run();
                 if (client != null && client.player != null) {
-                    client.player.sendMessage(Text.literal("Equipped cosmetic: " + packs.get(packIndex).name()), true);
+                    client.player.sendMessage(Text.literal((wasEquipped ? "Already equipped: " : "Equipped cosmetic: ") + pack.name()), true);
                 }
+            } else if (client != null && client.player != null) {
+                client.player.sendMessage(Text.literal("No cosmetic selected. Install a pack and reload."), true);
             }
         }).dimensions(center - 105, y + 28, 100, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Turn custom cosmetic off"), button -> {
@@ -68,12 +72,15 @@ public final class CosmeticSelectionScreen extends Screen {
         }).dimensions(center - 105, y + 56, 100, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Unequip selected"), button -> {
             if (packIndex >= 0 && packIndex < packs.size()) {
-                String id = packs.get(packIndex).id();
-                CosmeticPackFeatureRenderer.unequipPackId(id);
+                CosmeticPackLoader.CosmeticPack pack = packs.get(packIndex);
+                boolean wasEquipped = CosmeticPackFeatureRenderer.getSelectedPackIds().contains(pack.id());
+                CosmeticPackFeatureRenderer.unequipPackId(pack.id());
                 saveSettings.run();
                 if (client != null && client.player != null) {
-                    client.player.sendMessage(Text.literal("Unequipped cosmetic: " + packs.get(packIndex).name()), true);
+                    client.player.sendMessage(Text.literal((wasEquipped ? "Unequipped cosmetic: " : "Was not equipped: ") + pack.name()), true);
                 }
+            } else if (client != null && client.player != null) {
+                client.player.sendMessage(Text.literal("No cosmetic selected."), true);
             }
         }).dimensions(center + 5, y + 56, 100, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Reload packs"), button -> {
