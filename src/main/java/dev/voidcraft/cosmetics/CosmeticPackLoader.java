@@ -19,8 +19,8 @@ import java.util.logging.Logger;
 /**
  * Discovers user-installed cosmetic pack definitions.
  *
- * Metadata and file references are validated here. The model file is not yet
- * parsed and custom pack assets are not yet connected to the in-game renderer.
+ * Discovers and validates metadata, model definitions, and safe asset paths.
+ * The initial renderer currently supports custom head-slot packs only.
  */
 public final class CosmeticPackLoader {
     private static final Logger LOGGER = Logger.getLogger("VoidCraftCosmetics");
