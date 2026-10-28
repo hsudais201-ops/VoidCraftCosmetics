@@ -113,9 +113,32 @@ public final class CosmeticSelectionScreen extends Screen {
                 .filter(pack -> CosmeticPackFeatureRenderer.getSelectedPackIds().contains(pack.id()))
                 .map(CosmeticPackLoader.CosmeticPack::name)
                 .toList();
-        String equipped = equippedNames.isEmpty() ? "none" : String.join(", ", equippedNames);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Equipped: " + equipped), width / 2, height / 2 + 54, 0xAAFFAA);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Installed packs: " + packs.size()), width / 2, height / 2 + 68, 0xAAAAAA);
+        int maxTextWidth = Math.max(80, width - 24);
+        List<String> equippedLines = new java.util.ArrayList<>();
+        String currentLine = "Equipped: ";
+        if (equippedNames.isEmpty()) {
+            equippedLines.add("Equipped: none");
+        } else {
+            for (String name : equippedNames) {
+                String item = (currentLine.equals("Equipped: ") ? "" : ", ") + name;
+                if (textRenderer.getWidth(currentLine + item) > maxTextWidth && !currentLine.equals("Equipped: ")) {
+                    equippedLines.add(currentLine);
+                    currentLine = "  " + name;
+                } else {
+                    currentLine += item;
+                }
+                if (equippedLines.size() == 2 && textRenderer.getWidth(currentLine) > maxTextWidth) {
+                    currentLine = textRenderer.trimToWidth(currentLine, maxTextWidth - textRenderer.getWidth("…")) + "…";
+                    break;
+                }
+            }
+            if (!currentLine.isBlank() && equippedLines.size() < 3) equippedLines.add(currentLine);
+        }
+        int equippedY = height / 2 + 48;
+        for (int i = 0; i < equippedLines.size(); i++) {
+            context.drawCenteredTextWithShadow(textRenderer, Text.literal(equippedLines.get(i)), width / 2, equippedY + i * 11, 0xAAFFAA);
+        }
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Installed packs: " + packs.size()), width / 2, equippedY + equippedLines.size() * 11, 0xAAAAAA);
         if (packs.isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer, Text.literal("Add pack JSON, model JSON and PNG under config/voidcraft-cosmetics"), width / 2, height / 2 + 80, 0xFFCC66);
         }
