@@ -43,7 +43,14 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
             }
         });
 
-        cycleCustomPackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(\n                "key.voidcraft_cosmetics.cycle_custom_pack",\n                InputUtil.Type.KEYSYM,\n                GLFW.GLFW_KEY_P,\n                "category.voidcraft_cosmetics"\n        ));\n\n        cycleCosmeticsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        cycleCustomPackKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.voidcraft_cosmetics.cycle_custom_pack",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_P,
+                "category.voidcraft_cosmetics"
+        ));
+
+        cycleCosmeticsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.voidcraft_cosmetics.open_menu",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_O,
@@ -51,7 +58,14 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (cycleCustomPackKey.wasPressed()) {\n                String selected = CosmeticPackFeatureRenderer.cycleSelectedPack(discoveredPacks);\n                saveSettings();\n                if (client.player != null) {\n                    client.player.sendMessage(Text.literal("VoidCraft custom head cosmetic: " + selected), true);\n                }\n            }\n            while (cycleCosmeticsKey.wasPressed()) {
+            while (cycleCustomPackKey.wasPressed()) {
+                String selected = CosmeticPackFeatureRenderer.cycleSelectedPack(discoveredPacks);
+                saveSettings();
+                if (client.player != null) {
+                    client.player.sendMessage(Text.literal("VoidCraft custom head cosmetic: " + selected), true);
+                }
+            }
+            while (cycleCosmeticsKey.wasPressed()) {
                 String style = CosmeticCapFeatureRenderer.cycleStyle();
                 saveSettings();
                 if (client.player != null) {
@@ -67,7 +81,8 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
             try (InputStream input = Files.newInputStream(settingsFile)) {
                 properties.load(input);
                 int index = Integer.parseInt(properties.getProperty("capStyle", "1"));
-                CosmeticCapFeatureRenderer.setSelectedStyleIndex(index);\n                CosmeticPackFeatureRenderer.setSelectedPackId(properties.getProperty("selectedPackId", ""));
+                CosmeticCapFeatureRenderer.setSelectedStyleIndex(index);
+                CosmeticPackFeatureRenderer.setSelectedPackId(properties.getProperty("selectedPackId", ""));
             } catch (IOException | NumberFormatException exception) {
                 LOGGER.log(Level.WARNING, "Could not read cosmetics settings; using default style", exception);
             }
@@ -81,7 +96,8 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         try {
             Files.createDirectories(settingsFile.getParent());
             Properties properties = new Properties();
-            properties.setProperty("capStyle", Integer.toString(CosmeticCapFeatureRenderer.getSelectedStyleIndex()));\n            properties.setProperty("selectedPackId", CosmeticPackFeatureRenderer.getSelectedPackId());
+            properties.setProperty("capStyle", Integer.toString(CosmeticCapFeatureRenderer.getSelectedStyleIndex()));
+            properties.setProperty("selectedPackId", CosmeticPackFeatureRenderer.getSelectedPackId());
             try (OutputStream output = Files.newOutputStream(settingsFile)) {
                 properties.store(output, "VoidCraft Cosmetics settings");
             }
