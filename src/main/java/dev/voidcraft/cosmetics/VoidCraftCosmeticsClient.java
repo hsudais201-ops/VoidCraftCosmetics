@@ -76,7 +76,7 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
                 String selected = CosmeticPackFeatureRenderer.cycleSelectedPack(discoveredPacks);
                 saveSettings();
                 if (client.player != null) {
-                    client.player.sendMessage(Text.literal("VoidCraft custom head cosmetic: " + selected), true);
+                    client.player.sendMessage(Text.literal("VoidCraft custom cosmetic: " + selected), true);
                 }
             }
             while (cycleCosmeticsKey.wasPressed()) {
