@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
 
 /**
  * Built-in 3D cap preview. Press O to cycle through the available styles.
- * Custom pack rendering is not implemented yet.
+ * User-provided head packs are handled by CosmeticPackFeatureRenderer.
  */
 public final class CosmeticCapFeatureRenderer extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
     private static final Identifier[] TEXTURES = {
