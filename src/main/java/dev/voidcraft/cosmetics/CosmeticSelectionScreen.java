@@ -92,6 +92,25 @@ public final class CosmeticSelectionScreen extends Screen {
                 .dimensions(center + 5, y + 84, 100, 20).build());
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!packs.isEmpty() && keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT) {
+            packIndex = packIndex <= 0 ? packs.size() - 1 : packIndex - 1;
+            refreshPackLabel();
+            return true;
+        }
+        if (!packs.isEmpty() && keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT) {
+            packIndex = packIndex >= packs.size() - 1 ? 0 : packIndex + 1;
+            refreshPackLabel();
+            return true;
+        }
+        if (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
+            close();
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
     private void refreshPackLabel() {
         if (client != null && client.player != null) {
             String name = packIndex < 0 || packs.isEmpty() ? "Off" : packs.get(packIndex).name();
