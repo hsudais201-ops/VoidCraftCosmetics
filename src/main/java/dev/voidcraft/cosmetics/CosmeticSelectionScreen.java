@@ -104,10 +104,14 @@ public final class CosmeticSelectionScreen extends Screen {
         renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         String selected = packIndex < 0 || packs.isEmpty() ? "Off" : packs.get(packIndex).name();
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Highlighted cosmetic: " + selected), width / 2, height / 2 - 88, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Highlighted cosmetic: " + selected), width / 2, height / 2 - 100, 0xFFFFFF);
         if (packIndex >= 0 && packIndex < packs.size()) {
             CosmeticPackLoader.CosmeticPack pack = packs.get(packIndex);
+            boolean equipped = CosmeticPackFeatureRenderer.getSelectedPackIds().contains(pack.id());
+            context.drawCenteredTextWithShadow(textRenderer, Text.literal(equipped ? "Status: Equipped" : "Status: Not equipped"), width / 2, height / 2 - 86, equipped ? 0xAAFFAA : 0xFFCC66);
             context.drawCenteredTextWithShadow(textRenderer, Text.literal("Slot: " + pack.slot() + " | Animation: " + (pack.animation().isBlank() ? "none" : pack.animation())), width / 2, height / 2 - 72, 0xCCCCFF);
+        } else {
+            context.drawCenteredTextWithShadow(textRenderer, Text.literal("Choose an installed cosmetic below"), width / 2, height / 2 - 86, 0xAAAAAA);
         }
         List<String> equippedNames = packs.stream()
                 .filter(pack -> CosmeticPackFeatureRenderer.getSelectedPackIds().contains(pack.id()))
