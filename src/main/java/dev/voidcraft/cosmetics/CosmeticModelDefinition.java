@@ -75,6 +75,12 @@ public final class CosmeticModelDefinition {
                     if (uv[0] < 0 || uv[1] < 0 || uv[0] >= textureSize[0] || uv[1] >= textureSize[1]) {
                         throw new IllegalArgumentException("cube UV origin must be inside texture_size");
                     }
+                    // Approximate standard cuboid UV rectangle: 2*(width+depth) by height+depth.
+                    int uvWidth = (int) Math.ceil(2.0 * (size[0] + size[2]));
+                    int uvHeight = (int) Math.ceil(size[1] + size[2]);
+                    if (uv[0] + uvWidth > textureSize[0] || uv[1] + uvHeight > textureSize[1]) {
+                        throw new IllegalArgumentException("cube UV rectangle exceeds texture_size");
+                    }
                     cubes.add(new Cube(cubeOrigin, size, uv));
                 }
                 parts.add(new Part(name, origin, rotation, List.copyOf(cubes)));
