@@ -8,9 +8,13 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Initial client-side prototype. This toggles a status flag only; it does not
+ * render cosmetic models yet.
+ */
 public final class VoidCraftCosmeticsClient implements ClientModInitializer {
-    private static KeyBinding openCosmeticsKey;
-    private static boolean previewEnabled = true;
+    private KeyBinding openCosmeticsKey;
+    private boolean previewEnabled = true;
 
     @Override
     public void onInitializeClient() {
@@ -18,7 +22,7 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
                 "key.voidcraft_cosmetics.open_menu",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_O,
-                KeyBinding.Category.MISC
+                "category.voidcraft_cosmetics"
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -26,7 +30,9 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
                 previewEnabled = !previewEnabled;
                 if (client.player != null) {
                     client.player.sendMessage(
-                            Text.literal("VoidCraft Cosmetics preview: " + (previewEnabled ? "ON" : "OFF")),
+                            Text.literal("VoidCraft Cosmetics preview: "
+                                    + (previewEnabled ? "ON" : "OFF")
+                                    + " (prototype only)"),
                             true
                     );
                 }
