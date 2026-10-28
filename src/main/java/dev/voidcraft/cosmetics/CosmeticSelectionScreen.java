@@ -59,11 +59,21 @@ public final class CosmeticSelectionScreen extends Screen {
             saveSettings.run();
             refreshPackLabel();
         }).dimensions(center + 5, y + 28, 100, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Cycle built-in cap: " + CosmeticCapFeatureRenderer.getStyleName()), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("Cap: " + CosmeticCapFeatureRenderer.getStyleName()), button -> {
             CosmeticCapFeatureRenderer.cycleStyle();
             saveSettings.run();
             clearAndInit();
-        }).dimensions(center - 105, y + 56, 210, 20).build());
+        }).dimensions(center - 105, y + 56, 100, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Unequip selected"), button -> {
+            if (packIndex >= 0 && packIndex < packs.size()) {
+                String id = packs.get(packIndex).id();
+                CosmeticPackFeatureRenderer.unequipPackId(id);
+                saveSettings.run();
+                if (client != null && client.player != null) {
+                    client.player.sendMessage(Text.literal("Unequipped cosmetic: " + packs.get(packIndex).name()), true);
+                }
+            }
+        }).dimensions(center + 5, y + 56, 100, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), button -> close())
                 .dimensions(center - 50, y + 84, 100, 20).build());
     }
@@ -85,7 +95,13 @@ public final class CosmeticSelectionScreen extends Screen {
             CosmeticPackLoader.CosmeticPack pack = packs.get(packIndex);
             context.drawCenteredTextWithShadow(textRenderer, Text.literal("Slot: " + pack.slot() + " | Animation: " + (pack.animation().isBlank() ? "none" : pack.animation())), width / 2, height / 2 - 72, 0xCCCCFF);
         }
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Installed packs: " + packs.size()), width / 2, height / 2 + 66, 0xAAAAAA);
+        List<String> equippedNames = packs.stream()
+                .filter(pack -> CosmeticPackFeatureRenderer.getSelectedPackIds().contains(pack.id()))
+                .map(CosmeticPackLoader.CosmeticPack::name)
+                .toList();
+        String equipped = equippedNames.isEmpty() ? "none" : String.join(", ", equippedNames);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Equipped: " + equipped), width / 2, height / 2 + 54, 0xAAFFAA);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Installed packs: " + packs.size()), width / 2, height / 2 + 68, 0xAAAAAA);
         if (packs.isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer, Text.literal("Add pack JSON, model JSON and PNG under config/voidcraft-cosmetics"), width / 2, height / 2 + 80, 0xFFCC66);
         }
