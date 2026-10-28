@@ -47,15 +47,20 @@ public final class CosmeticCapFeatureRenderer extends FeatureRenderer<AbstractCl
 
     /** Cycles through four built-in texture styles and then turns the cap off. */
     public static String cycleStyle() {
-        selectedStyle++;
-        if (selectedStyle > TEXTURES.length) {
-            selectedStyle = 0;
-        }
+        selectedStyle = (selectedStyle + 1) % (TEXTURES.length + 1);
         return getStyleName();
     }
 
     public static String getStyleName() {
         return selectedStyle == 0 ? "Off" : STYLE_NAMES[selectedStyle - 1];
+    }
+
+    public static int getSelectedStyleIndex() {
+        return selectedStyle;
+    }
+
+    public static void setSelectedStyleIndex(int index) {
+        selectedStyle = Math.max(0, Math.min(index, TEXTURES.length));
     }
 
     @Override
