@@ -98,6 +98,10 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         if (id != null && !id.isBlank()) selectedPackIds.add(id);
     }
 
+    public static void unequipPackId(String id) {
+        if (id != null) selectedPackIds.remove(id);
+    }
+
     public static void clearSelectedPacks() {
         selectedPackIds.clear();
     }
