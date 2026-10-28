@@ -38,7 +38,7 @@ Validation currently checks:
 - Asset paths must be relative and stay inside the cosmetics directory, including after resolving symbolic links.
 - Definition files linked from outside the cosmetics directory are skipped.
 
-**Current renderer status:** valid `head` packs with this custom model schema and a matching PNG texture have an initial renderer. Press **P** to cycle through discovered head packs and then **Off**. Press **O** to cycle the separate built-in cap styles. Other slots are validated but are not rendered yet. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
+**Current renderer status:** the prototype attempts to render the selected pack for all five declared slots. Press **P** to cycle through discovered packs and then **Off**. Press **O** to cycle the separate built-in cap styles. Head packs attach to the head; body/back attach to the torso; leg/feet packs are drawn at both leg pivots. This is an early attachment strategy, not a polished anatomical fitting system—models may need slot-specific coordinates and may overlap. Animations are not implemented yet. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
 
 ## Supported model JSON schema (version 1)
 
@@ -67,4 +67,4 @@ The loader now parses and validates a simple VoidCraft cuboid format. This is a 
 
 Each part requires a name, three-number origin, and one or more cubes. Rotation is optional and defaults to zero. Each cube requires a three-number origin, positive three-number size, and two-number UV origin. Texture dimensions must be between 1 and 4096; models are limited to 64 parts and 256 cubes. Coordinates must be finite and within +/-1024.
 
-**Texture rules:** PNG files must be at most 8 MiB, have dimensions no larger than 4096×4096, and exactly match `texture_size`. Each cube's UV origin and estimated UV rectangle must fit within the declared texture. Invalid packs are skipped and logged. Rendering has not yet been verified in an actual Minecraft session.
+**Texture rules:** PNG files must be at most 8 MiB, have dimensions no larger than 4096×4096, and exactly match `texture_size`. Each cube's UV origin and estimated UV rectangle must fit within the declared texture. Invalid packs are skipped and logged. Rendering has not yet been verified in an actual Minecraft session. This is prototype support for the declared slots, not a guarantee that arbitrary models will fit every player skin or animation.
