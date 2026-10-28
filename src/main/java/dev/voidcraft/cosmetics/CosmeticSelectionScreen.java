@@ -179,7 +179,7 @@ public final class CosmeticSelectionScreen extends Screen {
             // Temporarily select the highlighted pack so its real feature renderer
             // draws it on the player model inside the GUI preview.
             CosmeticPackFeatureRenderer.setSelectedPackIds(List.of(packs.get(packIndex).id()));
-            context.drawEntity(width / 2 - 150, height / 2 + 36, 32,
+            net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(context, width / 2 - 150, height / 2 + 36, 32,
                     new Quaternionf().rotateY((float) Math.toRadians(25)), null, client.player);
         } catch (RuntimeException exception) {
             // A preview failure must not break the selection screen or spam chat.
