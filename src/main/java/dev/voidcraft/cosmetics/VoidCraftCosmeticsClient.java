@@ -4,7 +4,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.InputUtil;
@@ -12,23 +11,21 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 public final class VoidCraftCosmeticsClient implements ClientModInitializer {
-    private KeyBinding openCosmeticsKey;
-    private boolean previewEnabled = true;
+    private KeyBinding cycleCosmeticsKey;
 
     @Override
     public void onInitializeClient() {
-        var discoveredPacks = CosmeticPackLoader.discover(FabricLoader.getInstance().getGameDir());
+        var discoveredPacks = CosmeticPackLoader.discover(
+                net.fabricmc.loader.api.FabricLoader.getInstance().getGameDir());
         System.out.println("[VoidCraft Cosmetics] Valid cosmetic pack definitions found: " + discoveredPacks.size());
 
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, helper, context) -> {
             if (entityRenderer instanceof PlayerEntityRenderer playerRenderer) {
-                var feature = new CosmeticCapFeatureRenderer(playerRenderer);
-                helper.register(feature);
+                helper.register(new CosmeticCapFeatureRenderer(playerRenderer));
             }
         });
 
-        CosmeticCapFeatureRenderer.setEnabled(previewEnabled);
-        openCosmeticsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        cycleCosmeticsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.voidcraft_cosmetics.open_menu",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_O,
@@ -36,14 +33,10 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (openCosmeticsKey.wasPressed()) {
-                previewEnabled = !previewEnabled;
-                CosmeticCapFeatureRenderer.setEnabled(previewEnabled);
+            while (cycleCosmeticsKey.wasPressed()) {
+                String style = CosmeticCapFeatureRenderer.cycleStyle();
                 if (client.player != null) {
-                    client.player.sendMessage(
-                            Text.literal("VoidCraft 3D cap: " + (previewEnabled ? "ON" : "OFF")),
-                            true
-                    );
+                    client.player.sendMessage(Text.literal("VoidCraft cap style: " + style), true);
                 }
             }
         });
