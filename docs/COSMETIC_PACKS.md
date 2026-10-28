@@ -79,3 +79,64 @@ Model parts are rendered as separate named pieces. For independently moving wing
 Press `M` to open the cosmetic selection screen. Use **Previous Cosmetic** and **Next Cosmetic** to highlight an installed pack. **Equip Selected** adds it without removing other equipped packs. **Unequip Selected** removes only the highlighted pack. **Turn Custom Cosmetic Off** clears all equipped custom packs. The menu lists the currently equipped pack names and the total number of discovered packs. The built-in cap button cycles the separate built-in cap styles. `P` and `O` remain available as keyboard shortcuts.
 
 The menu currently lists names and metadata; it does not yet show a live 3D preview. Custom pack rendering and menu interaction still need in-game testing. This repository builds a Fabric mod JAR, not an Android APK. Other players will not necessarily see your cosmetics in multiplayer unless they have compatible client-side support or a compatible server/network synchronization system is added.
+
+
+## Quick start: install your first custom cosmetic
+
+1. Start Minecraft once with VoidCraft Cosmetics installed, then close the game.
+2. Open the Minecraft game directory and create `config/voidcraft-cosmetics/starter/models/` and `config/voidcraft-cosmetics/starter/textures/`.
+3. Save the pack definition below as `config/voidcraft-cosmetics/starter/starter_cap.json`.
+4. Save the model JSON below as `config/voidcraft-cosmetics/starter/models/starter_cap.json`.
+5. Put a **64×64 PNG** named `starter_cap.png` in `config/voidcraft-cosmetics/starter/textures/`. The PNG must be a real texture image; the mod does not generate missing textures.
+6. Launch the game and press **M**. Select **Starter Cap** and choose **Equip selected**. If it does not appear, check `logs/latest.log` for a VoidCraft Cosmetics warning.
+
+Pack definition (`starter_cap.json`):
+
+```json
+{
+  "format_version": 1,
+  "id": "starter_cap",
+  "name": "Starter Cap",
+  "slot": "head",
+  "model": "starter/models/starter_cap.json",
+  "texture": "starter/textures/starter_cap.png",
+  "animation": "bob"
+}
+```
+
+Model (`models/starter_cap.json`):
+
+```json
+{
+  "format_version": 1,
+  "texture_size": [64, 64],
+  "parts": [
+    {
+      "name": "cap_crown",
+      "origin": [0, -8, 0],
+      "rotation": [0, 0, 0],
+      "cubes": [
+        {
+          "origin": [-4, -4, -4],
+          "size": [8, 4, 8],
+          "uv": [0, 0]
+        }
+      ]
+    },
+    {
+      "name": "cap_brim",
+      "origin": [0, -5, 0],
+      "rotation": [0, 0, 0],
+      "cubes": [
+        {
+          "origin": [-4.5, -0.5, -4.5],
+          "size": [9, 1, 9],
+          "uv": [0, 16]
+        }
+      ]
+    }
+  ]
+}
+```
+
+This starter model is only a geometry template. You must supply a matching PNG texture, and you may need to adjust the model's origins and texture UVs for the look you want. If you change the texture dimensions, update `texture_size` to match. Pack assets are loaded from paths relative to the main `config/voidcraft-cosmetics/` directory, even when the definition is in a subfolder.
