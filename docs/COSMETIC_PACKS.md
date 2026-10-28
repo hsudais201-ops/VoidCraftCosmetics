@@ -76,7 +76,7 @@ Model parts are rendered as separate named pieces. For independently moving wing
 
 ## In-game selection menu
 
-Press `M` to open the cosmetic selection screen. Use **Previous Cosmetic** and **Next Cosmetic** to highlight an installed pack. **Equip Selected** adds it without removing other equipped packs. **Unequip Selected** removes only the highlighted pack. **Turn Custom Cosmetic Off** clears all equipped custom packs. The menu lists the currently equipped pack names and the total number of discovered packs. The built-in cap button cycles the separate built-in cap styles. `P` and `O` remain available as keyboard shortcuts.
+Press `M` to open the cosmetic selection screen. Use **Reload Packs** after adding, removing, or editing pack files while the game is running; the loader rescans definitions and refreshes cached custom models/textures. Use **Previous Cosmetic** and **Next Cosmetic** to highlight an installed pack. **Equip Selected** adds it without removing other equipped packs. **Unequip Selected** removes only the highlighted pack. **Turn Custom Cosmetic Off** clears all equipped custom packs. The menu lists the currently equipped pack names and the total number of discovered packs. The built-in cap button cycles the separate built-in cap styles. `P` and `O` remain available as keyboard shortcuts.
 
 The menu currently lists names and metadata; it does not yet show a live 3D preview. Custom pack rendering and menu interaction still need in-game testing. This repository builds a Fabric mod JAR, not an Android APK. Other players will not necessarily see your cosmetics in multiplayer unless they have compatible client-side support or a compatible server/network synchronization system is added.
 
