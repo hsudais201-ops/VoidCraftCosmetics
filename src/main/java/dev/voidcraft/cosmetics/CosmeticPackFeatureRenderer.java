@@ -29,10 +29,13 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
     private static final Logger LOG = Logger.getLogger("VoidCraftCosmetics");
     private static final Identifier FALLBACK = Identifier.of("minecraft", "textures/block/purple_wool.png");
     private final ModelPart model;
+    private final Identifier texture;
 
     public CosmeticPackFeatureRenderer(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context, List<CosmeticPackLoader.CosmeticPack> packs) {
         super(context);
-        this.model = build(packs);
+        LoadedPack loaded = build(packs);
+        this.model = loaded == null ? null : loaded.model();
+        this.texture = loaded == null ? FALLBACK : loaded.texture();
     }
 
     private static LoadedPack build(List<CosmeticPackLoader.CosmeticPack> packs) {
@@ -101,7 +104,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         if (model == null || player.isInvisible()) return;
         matrices.push();
         getContextModel().head.rotate(matrices);
-        model.render(matrices, consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(FALLBACK)), light, OverlayTexture.DEFAULT_UV);
+        model.render(matrices, consumers.getBuffer(RenderLayer.getEntityCutoutNoCull(texture)), light, OverlayTexture.DEFAULT_UV);
         matrices.pop();
     }
 }
