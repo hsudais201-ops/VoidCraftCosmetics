@@ -210,8 +210,8 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         if (loadedPacks.isEmpty() || player.isInvisible()) return;
         for (LoadedPack loaded : loadedPacks.values()) {
             switch (loaded.slot()) {
-                case "head" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().head, animationProgress);
-                case "body", "back" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().body, animationProgress);
+                case "head", "horns" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().head, animationProgress);
+                case "body", "back", "cape", "wings", "tail" -> renderOnPart(matrices, consumers, light, loaded, getContextModel().body, animationProgress);
                 case "legs" -> {
                     renderOnPart(matrices, consumers, light, loaded, getContextModel().leftLeg, animationProgress);
                     renderOnPart(matrices, consumers, light, loaded, getContextModel().rightLeg, animationProgress);
