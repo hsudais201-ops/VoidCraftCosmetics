@@ -190,6 +190,10 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
             case "spin" -> matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(progress * 3.0f));
             case "sway" -> matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Math.sin(phase) * 12.0f));
             case "flap" -> matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Math.sin(phase * 2.0f) * 28.0f));
+            case "tail" -> {
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Math.sin(phase) * 18.0f));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Math.sin(phase * 1.3f) * 10.0f));
+            }
             case "pulse" -> {
                 float scale = 1.0f + (float) Math.sin(phase) * 0.06f;
                 matrices.scale(scale, scale, scale);
