@@ -6,6 +6,11 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+import java.io.InputStream;
+import java.nio.file.Files;
 import net.minecraft.client.model.Dilation;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
@@ -30,7 +35,7 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
         this.model = build(packs);
     }
 
-    private static ModelPart build(List<CosmeticPackLoader.CosmeticPack> packs) {
+    private static LoadedPack build(List<CosmeticPackLoader.CosmeticPack> packs) {
         for (var pack : packs) {
             if (!pack.slot().equals("head")) continue;
             try {
@@ -51,13 +56,39 @@ public final class CosmeticPackFeatureRenderer extends FeatureRenderer<AbstractC
                     root.addChild("part_" + index++, builder, ModelTransform.of(p[0], p[1], p[2],
                             (float)Math.toRadians(r[0]), (float)Math.toRadians(r[1]), (float)Math.toRadians(r[2])));
                 }
-                return TexturedModelData.of(data, definition.textureWidth(), definition.textureHeight()).createModel();
+                ModelPart model = TexturedModelData.of(data, definition.textureWidth(), definition.textureHeight()).createModel();
+                Identifier texture = loadTexture(pack);
+                return new LoadedPack(model, texture);
             } catch (IOException | RuntimeException e) {
                 LOG.warning("Could not render pack " + pack.id() + ": " + e.getMessage());
             }
         }
         return null;
     }
+
+    private static Identifier loadTexture(CosmeticPackLoader.CosmeticPack pack) throws IOException {
+        if (Files.size(pack.texturePath()) > 8L * 1024L * 1024L) {
+            throw new IOException("texture PNG exceeds 8 MiB limit");
+        }
+        NativeImage image;
+        try (InputStream input = Files.newInputStream(pack.texturePath())) {
+            image = NativeImage.read(input);
+        }
+        if (image.getWidth() < 1 || image.getHeight() < 1 || image.getWidth() > 4096 || image.getHeight() > 4096) {
+            image.close();
+            throw new IOException("texture dimensions must be between 1 and 4096");
+        }
+        NativeImageBackedTexture nativeTexture = new NativeImageBackedTexture(image);
+        try {
+            return MinecraftClient.getInstance().getTextureManager().registerDynamicTexture(
+                    "voidcraft_" + pack.id().replaceAll("[^a-zA-Z0-9_.-]", "_"), nativeTexture);
+        } catch (RuntimeException exception) {
+            nativeTexture.close();
+            throw exception;
+        }
+    }
+
+    private record LoadedPack(ModelPart model, Identifier texture) {}
 
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider consumers, int light,
