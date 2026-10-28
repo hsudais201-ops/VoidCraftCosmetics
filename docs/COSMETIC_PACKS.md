@@ -29,4 +29,6 @@ config/voidcraft-cosmetics/
     └── starter_cap.png
 ```
 
-Allowed slots in this prototype are `head`, `body`, `back`, `legs`, and `feet`. Paths must stay inside the cosmetics directory. The current loader discovers definitions and checks that referenced files exist. **The model format is not yet implemented and these packs are not rendered in-game yet.** Do not assume the model JSON is compatible with Blockbench, GeckoLib, or Minecraft's vanilla model format until a format adapter is implemented.
+Allowed slots in this prototype are `head`, `body`, `back`, `legs`, and `feet`. Paths must stay inside the cosmetics directory. The loader discovers definitions and checks that referenced files exist. **Custom model JSON and textures are not yet connected to the renderer.**
+
+The currently rendered prototype cap is a separate built-in 3D mesh using Minecraft's purple wool texture. It can be toggled with **O**. Do not assume the custom model JSON is compatible with Blockbench, GeckoLib, or Minecraft's vanilla model format until a format adapter is implemented.
