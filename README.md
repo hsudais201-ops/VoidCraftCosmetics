@@ -12,9 +12,10 @@ The GitHub Actions workflow builds the project with Java 21 and uploads the JAR 
 - The selected style is saved in `config/voidcraft-cosmetics/settings.properties` and restored on the next launch.
 - Cap styles use built-in Minecraft wool textures; no extra texture files are required for these previews.
 - Cosmetic pack definitions are discovered recursively under `config/voidcraft-cosmetics/` and validated for supported fields, duplicate IDs, file extensions, and safe paths.
+- A custom version-1 cuboid JSON parser validates part origins/rotations, cube sizes/UV origins, texture dimensions, and model complexity limits.
 
 ## Not implemented yet
-Custom pack models and textures are not rendered; the pack loader currently validates their metadata and file references only. A full cosmetics selection screen, user-provided texture loading, capes/wings/tails/horns, animated models, and network synchronization remain future work. Other players will only see cosmetics when their client has compatible rendering/data support; this prototype does not synchronize equipped cosmetics.
+Custom pack models and textures are still not rendered; the mod now parses and validates the documented cuboid model format, but does not yet convert parsed cubes into Minecraft render parts or load user PNG textures. A full cosmetics selection screen, user-provided texture loading, capes/wings/tails/horns, animated models, and network synchronization remain future work. Other players will only see cosmetics when their client has compatible rendering/data support; this prototype does not synchronize equipped cosmetics.
 
 ## Settings file
 The mod creates `config/voidcraft-cosmetics/settings.properties`. The `capStyle` value is 0 for Off, 1 for Purple, 2 for Red, 3 for Blue, and 4 for Black. Press **O** in game to change it; the mod saves the new choice automatically.
