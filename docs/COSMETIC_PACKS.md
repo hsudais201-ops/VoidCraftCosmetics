@@ -69,6 +69,11 @@ Each part requires a name, three-number origin, and one or more cubes. Rotation 
 
 **Texture rules:** PNG files must be at most 8 MiB, have dimensions no larger than 4096×4096, and exactly match `texture_size`. Each cube's UV origin and estimated UV rectangle must fit within the declared texture. Invalid packs are skipped and logged. Rendering has not yet been verified in an actual Minecraft session. This is prototype support for the declared slots, not a guarantee that arbitrary models will fit every player skin or animation.
 
+
+### Named moving model parts
+
+Model parts are rendered as separate named pieces. For independently moving wings, name the pieces `left_wing` and `right_wing` (or `leftwing` and `rightwing`). For a moving tail, include `tail` in the part name, such as `tail_base` or `dragon_tail`. The renderer adds a simple mirrored flap to left/right wing pieces and a small sway to tail-named pieces while preserving each part's configured base rotation. This is still a basic preset animation: it does not add skeletal hierarchy, physics, or keyframes.
+
 ## In-game selection menu
 
 Press `M` to open the cosmetic selection screen. Use **Previous Cosmetic** and **Next Cosmetic** to highlight an installed pack. **Equip Selected** adds it without removing other equipped packs. **Unequip Selected** removes only the highlighted pack. **Turn Custom Cosmetic Off** clears all equipped custom packs. The menu lists the currently equipped pack names and the total number of discovered packs. The built-in cap button cycles the separate built-in cap styles. `P` and `O` remain available as keyboard shortcuts.
