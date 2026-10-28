@@ -1,18 +1,16 @@
 package dev.voidcraft.cosmetics;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-/**
- * Initial client-side prototype. This toggles a status flag only; it does not
- * render cosmetic models yet.
- */
 public final class VoidCraftCosmeticsClient implements ClientModInitializer {
     private KeyBinding openCosmeticsKey;
     private boolean previewEnabled = true;
@@ -22,6 +20,14 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         var discoveredPacks = CosmeticPackLoader.discover(FabricLoader.getInstance().getGameDir());
         System.out.println("[VoidCraft Cosmetics] Valid cosmetic pack definitions found: " + discoveredPacks.size());
 
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, helper, context) -> {
+            if (entityRenderer instanceof PlayerEntityRenderer playerRenderer) {
+                var feature = new CosmeticCapFeatureRenderer(playerRenderer);
+                helper.register(feature);
+            }
+        });
+
+        CosmeticCapFeatureRenderer.setEnabled(previewEnabled);
         openCosmeticsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.voidcraft_cosmetics.open_menu",
                 InputUtil.Type.KEYSYM,
@@ -32,11 +38,10 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openCosmeticsKey.wasPressed()) {
                 previewEnabled = !previewEnabled;
+                CosmeticCapFeatureRenderer.setEnabled(previewEnabled);
                 if (client.player != null) {
                     client.player.sendMessage(
-                            Text.literal("VoidCraft Cosmetics preview: "
-                                    + (previewEnabled ? "ON" : "OFF")
-                                    + " (prototype only)"),
+                            Text.literal("VoidCraft 3D cap: " + (previewEnabled ? "ON" : "OFF")),
                             true
                     );
                 }
