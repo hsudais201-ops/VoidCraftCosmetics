@@ -14,7 +14,7 @@ The loader searches subfolders recursively for JSON definitions. Example `starte
   "slot": "head",
   "model": "starter/models/starter_cap.json",
   "texture": "starter/textures/starter_cap.png",
-  "animation": ""
+  "animation": "bob"
 }
 ```
 
@@ -38,7 +38,7 @@ Validation currently checks:
 - Asset paths must be relative and stay inside the cosmetics directory, including after resolving symbolic links.
 - Definition files linked from outside the cosmetics directory are skipped.
 
-**Current renderer status:** the prototype attempts to render the selected pack for all five declared slots. Press **P** to cycle through discovered packs and then **Off**. Press **O** to cycle the separate built-in cap styles. Head packs attach to the head; body/back attach to the torso; leg/feet packs are drawn at both leg pivots. This is an early attachment strategy, not a polished anatomical fitting system—models may need slot-specific coordinates and may overlap. Animations are not implemented yet. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
+**Current renderer status:** the prototype attempts to render the selected pack for all five declared slots. Press **P** to cycle through discovered packs and then **Off**. Press **O** to cycle the separate built-in cap styles. Head packs attach to the head; body/back attach to the torso; leg/feet packs are drawn at both leg pivots. This is an early attachment strategy, not a polished anatomical fitting system—models may need slot-specific coordinates and may overlap. Basic named animation presets are supported: `""` (none), `bob`, `spin`, `sway`, and `pulse`. These are simple renderer transforms, not a full keyframe animation system. Blockbench, GeckoLib and other model formats are not supported until a format adapter is implemented.
 
 ## Supported model JSON schema (version 1)
 
