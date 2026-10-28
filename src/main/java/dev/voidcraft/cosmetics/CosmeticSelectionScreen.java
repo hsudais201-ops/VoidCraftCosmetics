@@ -4,6 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import org.joml.Quaternionf;
 
 import java.util.List;
 
@@ -122,6 +123,7 @@ public final class CosmeticSelectionScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
+        renderCosmeticPreview(context, delta);
         String selected = packIndex < 0 || packs.isEmpty() ? "Off" : packs.get(packIndex).name();
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Highlighted cosmetic: " + selected), width / 2, height / 2 - 100, 0xFFFFFF);
         if (packIndex >= 0 && packIndex < packs.size()) {
@@ -164,6 +166,27 @@ public final class CosmeticSelectionScreen extends Screen {
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Installed packs: " + packs.size()), width / 2, equippedY + equippedLines.size() * 11, 0xAAAAAA);
         if (packs.isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer, Text.literal("Add pack JSON, model JSON and PNG under config/voidcraft-cosmetics"), width / 2, height / 2 + 80, 0xFFCC66);
+        }
+    }
+
+    private void renderCosmeticPreview(DrawContext context, float delta) {
+        if (client == null || client.player == null || packIndex < 0 || packIndex >= packs.size()) {
+            return;
+        }
+        List<String> equippedBeforePreview = CosmeticPackFeatureRenderer.getSelectedPackIds();
+        try {
+            // Temporarily select the highlighted pack so its real feature renderer
+            // draws it on the player model inside the GUI preview.
+            CosmeticPackFeatureRenderer.setSelectedPackIds(List.of(packs.get(packIndex).id()));
+            context.drawEntity(width / 2 - 150, height / 2 + 36, 32,
+                    new Quaternionf().rotateY((float) Math.toRadians(25)), null, client.player);
+        } catch (RuntimeException exception) {
+            // A preview failure must not break the selection screen.
+            if (client.player != null) {
+                client.player.sendMessage(Text.literal("Cosmetic preview unavailable; you can still equip it."), true);
+            }
+        } finally {
+            CosmeticPackFeatureRenderer.setSelectedPackIds(equippedBeforePreview);
         }
     }
 
