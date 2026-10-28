@@ -37,6 +37,7 @@ public final class VoidCraftCosmeticsClient implements ClientModInitializer {
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, helper, context) -> {
             if (entityRenderer instanceof PlayerEntityRenderer playerRenderer) {
                 helper.register(new CosmeticCapFeatureRenderer(playerRenderer));
+                helper.register(new CosmeticPackFeatureRenderer(playerRenderer, discoveredPacks));
             }
         });
 
