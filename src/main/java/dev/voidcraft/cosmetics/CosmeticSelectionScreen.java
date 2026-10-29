@@ -15,6 +15,7 @@ public final class CosmeticSelectionScreen extends Screen {
     private final Runnable saveSettings;
     private final Runnable reloadPacks;
     private int packIndex;
+    private float previewYaw = 25.0F;
     private boolean previewWarningShown;
 
     public CosmeticSelectionScreen(Screen parent, List<CosmeticPackLoader.CosmeticPack> packs, Runnable saveSettings, Runnable reloadPacks) {
@@ -183,6 +184,24 @@ public final class CosmeticSelectionScreen extends Screen {
         }
     }
 
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        // Let players rotate the preview by dragging over its display area.
+        double previewLeft = width / 2.0 - 190.0;
+        double previewRight = width / 2.0 - 110.0;
+        double previewTop = height / 2.0 - 5.0;
+        double previewBottom = height / 2.0 + 75.0;
+        if (button == 0 && mouseX >= previewLeft && mouseX <= previewRight
+                && mouseY >= previewTop && mouseY <= previewBottom) {
+            previewYaw += (float) deltaX * 1.5F;
+            if (previewYaw > 360.0F || previewYaw < -360.0F) {
+                previewYaw %= 360.0F;
+            }
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
     private void renderCosmeticPreview(DrawContext context, float delta) {
         if (client == null || client.player == null || packIndex < 0 || packIndex >= packs.size()) {
             return;
@@ -193,7 +212,7 @@ public final class CosmeticSelectionScreen extends Screen {
             // draws it on the player model inside the GUI preview.
             CosmeticPackFeatureRenderer.setSelectedPackIds(List.of(packs.get(packIndex).id()));
             net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(context, width / 2 - 150, height / 2 + 36, 32.0F,
-                    new Vector3f(0.0F, 0.0F, 0.0F), new Quaternionf().rotateY((float) Math.toRadians(25)),
+                    new Vector3f(0.0F, 0.0F, 0.0F), new Quaternionf().rotateY((float) Math.toRadians(previewYaw)),
                     new Quaternionf(), client.player);
         } catch (RuntimeException exception) {
             // A preview failure must not break the selection screen or spam chat.
