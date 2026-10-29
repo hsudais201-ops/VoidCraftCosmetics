@@ -107,6 +107,18 @@ public final class CosmeticSelectionScreen extends Screen {
             refreshPackLabel();
             return true;
         }
+        if (!packs.isEmpty() && (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER
+                || keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER)
+                && packIndex >= 0 && packIndex < packs.size()) {
+            CosmeticPackLoader.CosmeticPack pack = packs.get(packIndex);
+            boolean wasEquipped = CosmeticPackFeatureRenderer.getSelectedPackIds().contains(pack.id());
+            CosmeticPackFeatureRenderer.equipPackId(pack.id());
+            saveSettings.run();
+            if (client != null && client.player != null) {
+                client.player.sendMessage(Text.literal((wasEquipped ? "Already equipped: " : "Equipped cosmetic: ") + pack.name()), true);
+            }
+            return true;
+        }
         if (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
             close();
             return true;
