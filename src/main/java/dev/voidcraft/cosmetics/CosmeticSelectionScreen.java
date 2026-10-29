@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -179,8 +180,9 @@ public final class CosmeticSelectionScreen extends Screen {
             // Temporarily select the highlighted pack so its real feature renderer
             // draws it on the player model inside the GUI preview.
             CosmeticPackFeatureRenderer.setSelectedPackIds(List.of(packs.get(packIndex).id()));
-            net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(context, width / 2 - 150, height / 2 + 36, 32,
-                    new Quaternionf().rotateY((float) Math.toRadians(25)), null, client.player);
+            net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(context, width / 2 - 150, height / 2 + 36, 32.0F,
+                    new Vector3f(0.0F, 0.0F, 0.0F), new Quaternionf().rotateY((float) Math.toRadians(25)),
+                    new Quaternionf(), client.player);
         } catch (RuntimeException exception) {
             // A preview failure must not break the selection screen or spam chat.
             if (!previewWarningShown && client.player != null) {
